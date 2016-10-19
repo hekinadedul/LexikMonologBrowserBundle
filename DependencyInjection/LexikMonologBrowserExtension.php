@@ -37,8 +37,9 @@ class LexikMonologBrowserExtension extends Extension
 
         if (isset($config['doctrine']['connection'])) {
             $connectionDefinition = new Definition('Doctrine\DBAL\Connection', array($config['doctrine']['connection']));
-            $connectionDefinition->setFactoryClass('Doctrine\DBAL\DriverManager');
-            $connectionDefinition->setFactoryMethod('getConnection');
+            $connectionDefinition->setFactory('Doctrine\DBAL\DriverManager::getConnection');
+//            $connectionDefinition->setFactoryClass('Doctrine\DBAL\DriverManager');
+//            $connectionDefinition->setFactoryMethod('getConnection');
             $container->setDefinition('lexik_monolog_browser.doctrine_dbal.connection', $connectionDefinition);
         }
     }
