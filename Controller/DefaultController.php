@@ -20,6 +20,9 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        ini_set('memory_limit', -1 );
+        ini_set('display_errors', 1);
+        ini_set('max_execution_time', 300 );
         try {
             $query = $this->getLogRepository()->getLogsQueryBuilder();
 

@@ -4,6 +4,10 @@ namespace Lexik\Bundle\MonologBrowserBundle\Form;
 
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -18,33 +22,35 @@ class LogSearchType extends AbstractType {
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
+        $qb = $options['query_builder'];
+
         $builder
-            ->add('term', 'search', [
+            ->add('term', SearchType::class, [
                 'required' => false,
+//                'query_builder' => $qb
             ])
-            ->add('level', 'choice', [
+            ->add('level', ChoiceType::class, [
                 'choices' => $options['log_levels'],
                 'required' => false,
             ])
-            ->add('date_from', 'datetime', [
+            ->add('date_from', DateTimeType::class, [
                 'date_widget' => 'single_text',
                 'date_format' => 'MM/dd/yyyy',
                 'time_widget' => 'text',
                 'required' => false,
             ])
-            ->add('date_to', 'datetime', [
+            ->add('date_to', DateTimeType::class, [
                 'date_widget' => 'single_text',
                 'date_format' => 'MM/dd/yyyy',
                 'time_widget' => 'text',
                 'required' => false,
             ]);
 
-        $qb = $options['query_builder'];
         $convertDateToDatabaseValue = function (\DateTime $date) use ($qb) {
             return Type::getType('datetime')->convertToDatabaseValue($date, $qb->getConnection()->getDatabasePlatform());
         };
-
-        $builder->addEventListener(FormEvents::POST_BIND, function (FormEvent $event) use ($qb, $convertDateToDatabaseValue) {
+//
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($qb, $convertDateToDatabaseValue) {
             $data = $event->getData();
 
             if (null !== $data['term']) {
